@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EEUCI - DISTRICT DE KOTOKODJI - Plateforme de Gestion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --eeuci-dark-green: #228B22;
+            --eeuci-light-green: #32CD32;
+            --eeuci-dark-purple: #800080;
+            --eeuci-light-purple: #DA70D6;
+            --eeuci-brown: #8B4513;
+            --eeuci-cream: #F5F5DC;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--eeuci-dark-green), var(--eeuci-light-green));
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, var(--eeuci-dark-green), var(--eeuci-brown));
+            color: white;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 5px 0;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: none;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: linear-gradient(90deg, var(--eeuci-dark-green), var(--eeuci-light-green));
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--eeuci-dark-green), var(--eeuci-light-green));
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--eeuci-light-green), var(--eeuci-dark-green));
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--eeuci-dark-green);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: var(--eeuci-dark-purple);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .logo-img {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            display: block;
+            border-radius: 50%;
+        }
+        
+        .module-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--eeuci-dark-green), var(--eeuci-light-green));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+        
+        .activity-item {
+            border-left: 3px solid var(--eeuci-dark-green);
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .status-en-cours {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-termine {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-en-attente {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .user-role-badge {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            background-color: var(--eeuci-dark-purple);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Page de Connexion -->
+    <div id="loginPage">
+        <div class="login-container">
+            <img src="IMG-20260112-WA0011.jpg" alt="Logo EEUCI - DISTRICT DE KOTOKODJI" class="logo-img">
+            <h3 class="text-center mb-4">EEUCI - DISTRICT DE KOTOKODJI</h3>
+            <h5 class="text-center mb-4">Plateforme de Gestion</h5>
+            
+            <div class="alert alert-danger" id="loginError" style="display: none;">
+                Identifiants incorrects. Veuillez réessayer.
+            </div>
+            
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Nom d'utilisateur ou Email</label>
+                    <input type="text" class="form-control" id="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Mot de passe</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                    <label class="form-check-label" for="rememberMe">Se souvenir de moi</label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+            </form>
+            
+            <div class="text-center mt-3">
+                <a href="#" onclick="showRegisterForm()">Créer un compte</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Formulaire d'Inscription -->
+    <div id="registerPage" style="display: none;">
+        <div class="login-container">
+            <img src="https://static-us-img.skywork.ai/prod/analysis/2026-01-15/4988253980883984564/2011884573984362496_0d39c6edfb3285ad2b4a509769761671.jpg" alt="Logo EEUCI - DISTRICT DE KOTOKODJI" class="logo-img">
+            <h3 class="text-center mb-4">EEUCI - DISTRICT DE KOTOKODJI</h3>
+            <h5 class="text-center mb-4">Création de compte</h5>
+            
+            <div class="alert alert-danger" id="registerError" style="display: none;">
+            </div>
+            
+            <div class="alert alert-success" id="registerSuccess" style="display: none;">
+                Compte créé avec succès ! Vous pouvez maintenant vous connecter.
+            </div>
+            
+            <form id="registerForm">
+                <div class="mb-3">
+                    <label for="regUsername" class="form-label">Nom d'utilisateur</label>
+                    <input type="text" class="form-control" id="regUsername" required>
+                    <div class="form-text">Doit être unique et ne contenir que des lettres, chiffres et tirets bas.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="regEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="regEmail" required>
+                    <div class="form-text">Nous n'utiliserons jamais votre email à mauvais escient.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="regFirstName" class="form-label">Prénom</label>
+                    <input type="text" class="form-control" id="regFirstName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="regLastName" class="form-label">Nom</label>
+                    <input type="text" class="form-control" id="regLastName" required>
+                </div>
+                
+                   <div class="mb-3">
+                    <label for="regLastName" class="form-label">Genre</label>
+                    <select name="genre" required>
+                        <option >Homme</option>
+                        <option >Femme</option>
+                    </select>
+                </div>  
+
+                <div class="mb-3">
+                    <label for="reggenre" class="form-label">Grade</label>
+                    <select name="grade" required>
+                        <option >Loveteau</option>
+                        <option >Eclaireur</option>
+                        <option >Cheminot</option>
+                        <option >Routier</option>
+                        <option >Chef</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="regPassword" class="form-label">Mot de passe</label>
+                    <input type="password" class="form-control" id="regPassword" required>
+                    <div class="form-text">Doit contenir au moins 8 caractères.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="regConfirmPassword" class="form-label">Confirmer le mot de passe</label>
+                    <input type="password" class="form-control" id="regConfirmPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
+            </form>
+            
+            <div class="text-center mt-3">
+                <a href="#" onclick="showLoginForm()">Déjà un compte ? Se connecter</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Interface Principale (cachée par défaut) -->
+    <div id="mainApp" style="display: none;">
+        <!-- Barre de Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <img src="https://static-us-img.skywork.ai/prod/analysis/2026-01-15/4988253980883984564/2011884573984362496_0d39c6edfb3285ad2b4a509769761671.jpg" alt="Logo" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px;">
+                    EEUCI - DISTRICT DE KOTOKODJI
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item position-relative">
+                            <a class="nav-link" href="#" onclick="showNotifications()">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-badge">3</span>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i><span id="userDisplayName">Utilisateur</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Mon Profil</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Paramètres</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-lg-2 col-md-3 sidebar">
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="#" onclick="showDashboard()">
+                            <i class="fas fa-home me-2"></i>Tableau de bord
+                        </a>
+                        <a class="nav-link" href="#" onclick="showNews()">
+                            <i class="fas fa-newspaper me-2"></i>Actualités
+                        </a>
+                        <a class="nav-link" href="#" onclick="showDocuments()">
+                            <i class="fas fa-file-alt me-2"></i>Documents & Cours
+                        </a>
+                        <a class="nav-link" href="#" onclick="showActivities()">
+                            <i class="fas fa-tasks me-2"></i>Activités & Suivi
+                        </a>
+                        <a class="nav-link" href="#" onclick="showAudit()">
+                            <i class="fas fa-search me-2"></i>Inspection & Audit
+                        </a>
+                        <a class="nav-link" href="#" onclick="showMembers()">
+                            <i class="fas fa-users me-2"></i>Gestion des Membres
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSearch()">
+                            <i class="fas fa-search me-2"></i>Recherche avancée
+                        </a>
+                    </nav>
+                </div>
+                
+                <!-- Contenu Principal -->
+                <div class="col-lg-10 col-md-9 p-4">
+                    <!-- Dashboard -->
+                    <div id="dashboardView">
+                        <h2><i class="fas fa-home me-2"></i>Tableau de bord</h2>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <h3 id="membersCount">142</h3>
+                                    <p>Membres actifs</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <h3>28</h3>
+                                    <p>Documents récents</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-tasks"></i>
+                                    </div>
+                                    <h3>12</h3>
+                                    <p>Audits en cours</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <h3>8</h3>
+                                    <p>Activités planifiées</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-bar me-2"></i>Statistiques des Activités
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="activitiesChart" height="100"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-bell me-2"></i>Alertes importantes
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            Réunion planifiée pour demain à 14h
+                                        </div>
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Nouveaux documents disponibles
+                                        </div>
+                                        <div class="alert alert-success">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            Audit terminé avec succès
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-history me-2"></i>Activités récentes
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="activity-item">
+                                            <h6>Rapport d'activité mensuel <span class="badge status-termine">Terminé</span></h6>
+                                            <p class="text-muted">Soumis par Admin Principal - Il y a 2 heures</p>
+                                        </div>
+                                        <div class="activity-item">
+                                            <h6>Planification du camp d'été <span class="badge status-en-cours">En cours</span></h6>
+                                            <p class="text-muted">Responsable Activité - Il y a 1 jour</p>
+                                        </div>
+                                        <div class="activity-item">
+                                            <h6>Mise à jour des documents de formation <span class="badge status-termine">Terminé</span></h6>
+                                            <p class="text-muted">Membre Actif - Il y a 2 jours</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actualités -->
+                    <div id="newsView" style="display: none;">
+                        <h2><i class="fas fa-newspaper me-2"></i>Actualités & Notifications</h2>
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-plus me-2"></i>Nouvelle publication
+                            </div>
+                            <div class="card-body">
+                                <form id="newsForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Titre</label>
+                                        <input type="text" class="form-control" id="newsTitle" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Contenu</label>
+                                        <textarea class="form-control" id="newsContent" rows="5" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Publier</button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <i class="fas fa-bell me-2"></i>Actualités récentes
+                            </div>
+                            <div class="card-body" id="newsList">
+                                <div class="activity-item">
+                                    <h5>Camp de printemps 2026 - Inscriptions ouvertes</h5>
+                                    <p>Les inscriptions pour le camp de printemps sont maintenant ouvertes. Contactez votre responsable d'activité pour plus d'informations.</p>
+                                    <small class="text-muted">Publié il y a 3 jours par Admin Principal</small>
+                                </div>
+                                <hr>
+                                <div class="activity-item">
+                                    <h5>Nouveau guide de formation disponible</h5>
+                                    <p>Le nouveau guide de formation pour les éclaireurs a été mis en ligne dans la section Documents.</p>
+                                    <small class="text-muted">Publié il y a 1 semaine par Responsable Activité</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Documents & Cours -->
+                    <div id="documentsView" style="display: none;">
+                        <h2><i class="fas fa-file-alt me-2"></i>Documents & Cours</h2>
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-upload me-2"></i>Uploader un document
+                            </div>
+                            <div class="card-body">
+                                <form id="documentForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Titre du document</label>
+                                        <input type="text" class="form-control" id="docTitle" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Catégorie</label>
+                                        <select class="form-control" id="docCategory">
+                                            <option value="cours">Cours</option>
+                                            <option value="rapports">Rapports</option>
+                                            <option value="guides">Guides</option>
+                                            <option value="archives">Archives</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" id="docDescription" rows="2"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Fichier</label>
+                                        <input type="file" class="form-control" id="docFile" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Uploader</button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <i class="fas fa-folder me-2"></i>Documents récents
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group" id="documentsList">
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">Guide de formation 2026</h5>
+                                            <small>3 jours ago</small>
+                                        </div>
+                                        <p class="mb-1">Guide complet pour la formation des éclaireurs.</p>
+                                        <small>Catégorie: Guides</small>
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">Rapport d'activité Q1</h5>
+                                            <small>1 semaine ago</small>
+                                        </div>
+                                        <p class="mb-1">Rapport détaillé des activités du premier trimestre.</p>
+                                        <small>Catégorie: Rapports</small>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Activités & Suivi -->
+                    <div id="activitiesView" style="display: none;">
+                        <h2><i class="fas fa-tasks me-2"></i>Activités & Suivi</h2>
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-plus me-2"></i>Nouvelle activité
+                            </div>
+                            <div class="card-body">
+                                <form id="activityForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nom de l'activité</label>
+                                        <input type="text" class="form-control" id="activityName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" id="activityDescription" rows="3"></textarea>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Date de début</label>
+                                                <input type="date" class="form-control" id="activityStartDate" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Date de fin</label>
+                                                <input type="date" class="form-control" id="activityEndDate" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Créer l'activité</button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <i class="fas fa-list me-2"></i>Activités en cours
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Activité</th>
+                                                <th>Date</th>
+                                                <th>Statut</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="activitiesTable">
+                                            <tr>
+                                                <td>Planification camp d'été</td>
+                                                <td>15-25 Juin 2026</td>
+                                                <td><span class="badge status-en-cours">En cours</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Voir</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Formation nouveaux membres</td>
+                                                <td>20-22 Mai 2026</td>
+                                                <td><span class="badge status-en-attente">En attente</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Voir</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gestion des Membres -->
+                    <div id="membersView" style="display: none;">
+                        <h2><i class="fas fa-users me-2"></i>Gestion des Membres</h2>
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-users me-2"></i>Liste des membres
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Utilisateur</th>
+                                                <th>Email</th>
+                                                <th>Rôle</th>
+                                                <th>Inscrit le</th>
+                                                <th>Dernière connexion</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="membersTable">
+                                            <tr>
+                                                <td>
+                                                    <div>Admin Principal</div>
+                                                    <small class="text-muted">admin</small>
+                                                </td>
+                                                <td>admin@eeuci-kotokodji.org</td>
+                                                <td><span class="user-role-badge">Administrateur</span></td>
+                                                <td>15/01/2026</td>
+                                                <td>Aujourd'hui à 09:30</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div>Responsable Activité</div>
+                                                    <small class="text-muted">responsable</small>
+                                                </td>
+                                                <td>responsable@eeuci-kotokodji.org</td>
+                                                <td><span class="user-role-badge">Responsable</span></td>
+                                                <td>15/01/2026</td>
+                                                <td>Hier à 16:45</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div>Membre Actif</div>
+                                                    <small class="text-muted">membre1</small>
+                                                </td>
+                                                <td>membre1@eeuci-kotokodji.org</td>
+                                                <td><span class="user-role-badge">Membre</span></td>
+                                                <td>15/01/2026</td>
+                                                <td>Aujourd'hui à 10:15</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Base de données simulée en mémoire
+        let users = [
+            {
+                id: 1,
+                username: 'admin',
+                email: 'admin@eeuci-kotokodji.org',
+                password: 'admin123', // En production, ce serait un hash
+                firstName: 'Admin',
+                lastName: 'Principal',
+                role: 'admin',
+                createdAt: '2026-01-15',
+                lastLogin: '2026-01-15 09:30:00'
+            },
+            {
+                id: 2,
+                username: 'responsable',
+                email: 'responsable@eeuci-kotokodji.org',
+                password: 'resp123', // En production, ce serait un hash
+                firstName: 'Responsable',
+                lastName: 'Activité',
+                role: 'responsable',
+                createdAt: '2026-01-15',
+                lastLogin: '2026-01-14 16:45:00'
+            },
+            {
+                id: 3,
+                username: 'membre1',
+                email: 'membre1@eeuci-kotokodji.org',
+                password: 'membre123', // En production, ce serait un hash
+                firstName: 'Membre',
+                lastName: 'Actif',
+                role: 'member',
+                createdAt: '2026-01-15',
+                lastLogin: '2026-01-15 10:15:00'
+            }
+        ];
+        
+        // Données de session utilisateur
+        let currentUser = null;
+        let sessionToken = null;
+        
+        // Fonctions de navigation
+        function showLoginForm() {
+            document.getElementById('loginPage').style.display = 'block';
+            document.getElementById('registerPage').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('registerSuccess').style.display = 'none';
+            document.getElementById('registerError').style.display = 'none';
+        }
+        
+        function showRegisterForm() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('registerPage').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('registerSuccess').style.display = 'none';
+            document.getElementById('registerError').style.display = 'none';
+        }
+        
+        function showMainApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('registerPage').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            // Mise à jour du nom d'utilisateur
+            if (currentUser) {
+                document.getElementById('userDisplayName').textContent = currentUser.firstName + ' ' + currentUser.lastName;
+                // Mettre à jour le compteur de membres
+                document.getElementById('membersCount').textContent = users.length;
+            }
+            
+            // Initialisation du graphique
+            initChart();
+        }
+        
+        // Fonctions de vue
+        function showDashboard() {
+            document.getElementById('dashboardView').style.display = 'block';
+            document.getElementById('newsView').style.display = 'none';
+            document.getElementById('documentsView').style.display = 'none';
+            document.getElementById('activitiesView').style.display = 'none';
+            document.getElementById('membersView').style.display = 'none';
+        }
+        
+        function showNews() {
+            document.getElementById('dashboardView').style.display = 'none';
+            document.getElementById('newsView').style.display = 'block';
+            document.getElementById('documentsView').style.display = 'none';
+            document.getElementById('activitiesView').style.display = 'none';
+            document.getElementById('membersView').style.display = 'none';
+        }
+        
+        function showDocuments() {
+            document.getElementById('dashboardView').style.display = 'none';
+            document.getElementById('newsView').style.display = 'none';
+            document.getElementById('documentsView').style.display = 'block';
+            document.getElementById('activitiesView').style.display = 'none';
+            document.getElementById('membersView').style.display = 'none';
+        }
+        
+        function showActivities() {
+            document.getElementById('dashboardView').style.display = 'none';
+            document.getElementById('newsView').style.display = 'none';
+            document.getElementById('documentsView').style.display = 'none';
+            document.getElementById('activitiesView').style.display = 'block';
+            document.getElementById('membersView').style.display = 'none';
+        }
+        
+        function showMembers() {
+            document.getElementById('dashboardView').style.display = 'none';
+            document.getElementById('newsView').style.display = 'none';
+            document.getElementById('documentsView').style.display = 'none';
+            document.getElementById('activitiesView').style.display = 'none';
+            document.getElementById('membersView').style.display = 'block';
+        }
+        
+        // Initialisation du graphique
+        function initChart() {
+            const ctx = document.getElementById('activitiesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+                    datasets: [{
+                        label: 'Activités terminées',
+                        data: [12, 19, 8, 15, 11, 17],
+                        backgroundColor: 'rgba(34, 139, 34, 0.7)',
+                        borderColor: 'rgba(34, 139, 34, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Gestion de l'authentification
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Recherche de l'utilisateur (par username ou email)
+            const user = users.find(u => 
+                (u.username === username || u.email === username) && u.password === password
+            );
+            
+            if (user) {
+                // Mettre à jour les informations de l'utilisateur courant
+                currentUser = {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    role: user.role
+                };
+                
+                // Mettre à jour la date de dernière connexion
+                const now = new Date();
+                user.lastLogin = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+                
+                // Générer un token de session
+                sessionToken = 'session_' + Math.random().toString(36).substr(2, 9);
+                
+                // Afficher l'interface principale
+                showMainApp();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('loginError').style.display = 'none';
+                }, 3000);
+            }
+        });
+        
+        // Gestion de l'inscription
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const firstName = document.getElementById('regFirstName').value;
+            const lastName = document.getElementById('regLastName').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            // Validation des mots de passe
+            if (password !== confirmPassword) {
+                document.getElementById('registerError').textContent = 'Les mots de passe ne correspondent pas.';
+                document.getElementById('registerError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('registerError').style.display = 'none';
+                }, 3000);
+                return;
+            }
+            
+            // Validation de la longueur du mot de passe
+            if (password.length < 8) {
+                document.getElementById('registerError').textContent = 'Le mot de passe doit contenir au moins 8 caractères.';
+                document.getElementById('registerError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('registerError').style.display = 'none';
+                }, 3000);
+                return;
+            }
+            
+            // Vérification si le nom d'utilisateur ou l'email existe déjà
+            const usernameExists = users.some(u => u.username === username);
+            const emailExists = users.some(u => u.email === email);
+            
+            if (usernameExists) {
+                document.getElementById('registerError').textContent = 'Ce nom d\'utilisateur est déjà pris.';
+                document.getElementById('registerError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('registerError').style.display = 'none';
+                }, 3000);
+                return;
+            }
+            
+            if (emailExists) {
+                document.getElementById('registerError').textContent = 'Cet email est déjà utilisé.';
+                document.getElementById('registerError').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('registerError').style.display = 'none';
+                }, 3000);
+                return;
+            }
+            
+            // Création du nouvel utilisateur
+            const newUser = {
+                id: users.length + 1,
+                username: username,
+                email: email,
+                password: password, // En production, ce serait un hash
+                firstName: firstName,
+                lastName: lastName,
+                role: 'member', // Par défaut, les nouveaux utilisateurs sont des membres
+                createdAt: new Date().toISOString().split('T')[0],
+                lastLogin: null
+            };
+            
+            // Ajout à la base de données
+            users.push(newUser);
+            
+            // Affichage du message de succès
+            document.getElementById('registerSuccess').style.display = 'block';
+            
+            // Réinitialisation du formulaire
+            document.getElementById('registerForm').reset();
+            
+            // Retour à la page de connexion après 2 secondes
+            setTimeout(() => {
+                showLoginForm();
+            }, 2000);
+        });
+        
+        // Déconnexion
+        function logout() {
+            currentUser = null;
+            sessionToken = null;
+            showLoginForm();
+        }
+        
+        // Gestion des formulaires
+        document.getElementById('newsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Actualité publiée avec succès !');
+            this.reset();
+        });
+        
+        document.getElementById('documentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Document uploadé avec succès !');
+            this.reset();
+        });
+        
+        document.getElementById('activityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Activité créée avec succès !');
+            this.reset();
+        });
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            showLoginForm();
+        });
+    </script>
+</body>
+</html>
